@@ -1,0 +1,139 @@
+@import "tailwindcss";
+body {
+    /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+    font-family: Arial, Helvetica, sans-serif;
+    /* display: flex; */
+    /* justify-content: center;
+    align-items: center;
+    min-height: 100vh; */
+    @apply flex justify-center items-center min-h-dvh;
+    @apply bg-gradient-to-r from-[#667eea] to-[#764ba2];
+}
+
+.background-color {
+    @apply bg-gradient-to-r from-[#667eea] to-[#764ba2]
+}
+/* 
+main {
+    background: white;
+    padding: 2rem;
+    margin: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 100%;
+}
+
+.title {
+    text-align: center;
+    padding: 1rem;
+    font-size: 3rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-content {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 2rem;
+}
+
+.content {
+    border: 2px solid #e0e0e0;
+    border-radius: 7px;
+    padding: 15px;
+    flex: 1;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    outline: none;
+}
+.content:focus{
+    border-color: #667eea;
+}
+.btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 5px;
+    color: white;
+    padding: 0 25px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: transform 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
+}
+
+.card {
+    display: flex;
+    list-style-type: none;
+    background: #f8f9fa;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 10px;
+    align-items: center;
+    transition: transform 0.3s ease;
+    border-left: 4px solid #667eea;
+}
+
+.card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.todolist span {
+    flex: 1;
+}
+
+.action {
+    display: flex;
+    gap: 1rem;
+}
+
+.complete-btn {
+    background: #28a745;
+    color: white;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+} */
+
+.complete-btn,
+.delete-btn {
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    transition: background-color transform 0.3s ease;
+    cursor: pointer;
+}
+
+.complete-btn:hover {
+    transform: scale(1.05);
+    background-color: #187b2f;
+}
+
+.delete-btn:hover {
+    transform: scale(1.05);
+    background-color: #ac1f2d;
+}
+.complete{
+    background: #e8f5e8;
+    border-left-color: #28a745;
+}
+.complete span{
+    text-decoration: line-through;
+}
+/* .empty-background{
+      text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 40px 20px;
+    font-size: 18px;
+} */
