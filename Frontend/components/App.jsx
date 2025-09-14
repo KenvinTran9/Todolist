@@ -31,7 +31,7 @@ function App({ token }) {
     }
   }, [token]);
 
-  // Thêm todo
+
   const handleAdd = async () => {
     if (input.trim() === "") {
       alert("Please enter something");
@@ -53,7 +53,8 @@ function App({ token }) {
         return;
       }
 
-      const newTodo = await response.json(); 
+      const newTodo = await response.json();
+      console.log("Added todo:", newTodo);
       setTodos([...todos, newTodo]);
       setInput("");
     } catch (err) {
@@ -63,13 +64,15 @@ function App({ token }) {
 
   const handleComplete = async (id) => {
     try {
+      const todo = todos.find((t) => t.id === id);
+
       const response = await fetch(`http://localhost:4000/todos/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({}), 
+        body: JSON.stringify({ isCompleted: !todo.isCompleted }),
       });
 
       if (!response.ok) {
@@ -78,11 +81,12 @@ function App({ token }) {
       }
 
       const updated = await response.json();
-      setTodos(todos.map((todo) => (todo.id === id ? updated : todo)));
+      setTodos(todos.map((t) => (t.id === id ? updated : t)));
     } catch (err) {
       console.error("Error updating todo:", err);
     }
   };
+
 
   const handleDelete = async (id) => {
     try {
@@ -98,7 +102,7 @@ function App({ token }) {
         return;
       }
 
-      setTodos(todos.filter((todo) => todo.id !== id));
+      setTodos(todos.filter((t) => t.id !== id));
     } catch (err) {
       console.error("Error deleting todo:", err);
     }
@@ -135,7 +139,7 @@ function App({ token }) {
                 todo.isCompleted ? "line-through text-gray-500" : ""
               }`}
             >
-              <span className="flex-1">{todo.text}</span>
+              <span className="flex-1">{todo.text} </span>
               <div className="action flex gap-4">
                 <button
                   className="complete-btn bg-green-600 text-white font-bold px-4 py-2 rounded hover:scale-105 hover:bg-green-700"
