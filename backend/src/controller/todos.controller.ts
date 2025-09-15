@@ -11,9 +11,9 @@ export class TodosController {
   }
 
   @Post('create')
-  create(@Body() body: { text: string }): { todo: Todo } {
+  create(@Body() body: { text: string }): Todo  {
     const todo = this.todosService.create(body.text);
-    return { todo };
+    return todo;
   }
 
   @Put(':id')

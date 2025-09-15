@@ -55,7 +55,7 @@ function App({ token }) {
 
       const newTodo = await response.json();
       console.log("Added todo:", newTodo);
-      setTodos([...todos, newTodo]);
+      setTodos([...todos, newTodo.todo]);
       setInput("");
     } catch (err) {
       console.error("Error adding todo:", err);
