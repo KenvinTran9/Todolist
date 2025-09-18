@@ -27,9 +27,11 @@ function Login({ onLogin }) {
         return;
       }
 
-      const { token } = await response.json();
-      localStorage.setItem("token", token); // ✅ Lưu token vào localStorage
-      onLogin(token); // ✅ báo cho Home biết đã login thành công
+      const { accessToken } = await response.json();
+      localStorage.setItem("token", accessToken);
+      onLogin(accessToken);
+      localStorage.setItem("token", accessToken);
+      onLogin(accessToken);
 
       // Clear input
       setUsername("");

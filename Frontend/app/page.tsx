@@ -10,15 +10,35 @@ export default function Home() {
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     if (savedToken) {
-      setToken(savedToken);
+      fetch("http://localhost:4000/auth/verify", {
+        headers: { Authorization: `Bearer ${savedToken}` },
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Invalid token");
+          setToken(savedToken);
+        })
+        .catch(() => {
+          localStorage.removeItem("token");
+          setToken(null);
+        });
     }
   }, []);
 
+  const handleLogin = (tk: string) => {
+    setToken(tk);
+    localStorage.setItem("token", tk);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+  };
+
   return (
     <main className="main bg-white p-8 m-8 rounded-xl shadow-sm max-w-lg w-full">
-      <Header />
+      <Header onLogout={handleLogout} token={token} />
       {!token ? (
-        <Login onLogin={(tk: string) => setToken(tk)} />
+        <Login onLogin={handleLogin} />
       ) : (
         <App token={token} />
       )}
