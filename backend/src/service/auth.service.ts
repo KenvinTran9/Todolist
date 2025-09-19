@@ -8,8 +8,16 @@ export class AuthService {
   constructor(private jwtService: JwtService) {}
 
   private users = [
-    { id: 1, username: 'admin', password: '$2a$12$P6wUQb0RKIi4M.m4hVv37.vkcAUFIkgC0zoBEETwm4siXkyIeR0Wu' }, // 1234
-    { id: 2, username: 'admin1', password: '$2a$12$HadHxEYPE2SNbTHthbzzGe5zijKLaTS0njZZ0tvXJRuNpaWdj/QgO' }, // 12345
+    {
+      id: 1,
+      username: 'admin',
+      password: '$2a$12$P6wUQb0RKIi4M.m4hVv37.vkcAUFIkgC0zoBEETwm4siXkyIeR0Wu',
+    }, // 1234
+    {
+      id: 2,
+      username: 'admin1',
+      password: '$2a$12$HadHxEYPE2SNbTHthbzzGe5zijKLaTS0njZZ0tvXJRuNpaWdj/QgO',
+    }, // 12345
   ];
 
   async validateUser(username: string, password: string) {
@@ -24,12 +32,20 @@ export class AuthService {
 
   async login(username: string, password: string) {
     const user = await this.validateUser(username, password);
-    const payload: JwtPayload = { username: user.username, sub: user.id, role: user.username === 'admin' ? 'admin' : 'user' };
+    const payload: JwtPayload = {
+      username: user.username,
+      sub: user.id,
+      role: user.username === 'admin' ? 'admin' : 'user',
+    };
     const accessToken = await this.jwtService.signAsync(payload);
 
     return {
       accessToken,
-      user: { id: user.id, username: user.username, role: user.username === 'admin' ? 'admin' : 'user' },
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.username === 'admin' ? 'admin' : 'user',
+      },
     };
   }
-} 
+}
