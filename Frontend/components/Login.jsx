@@ -14,7 +14,7 @@ function Login({ onLogin }) {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:4000/auth/login", {
+      const response = await fetch("http://localhost:4000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -23,17 +23,24 @@ function Login({ onLogin }) {
       });
 
       if (!response.ok) {
-        alert("Invalid username or password");
+        if (response.status === 401) {
+          alert("Invalid username or password");
+        } else {
+          alert("Server error, please try again later");
+        }
         return;
       }
 
-      const { accessToken } = await response.json();
-      localStorage.setItem("token", accessToken);
-      onLogin(accessToken);
-      localStorage.setItem("token", accessToken);
-      onLogin(accessToken);
+      const { accessToken, user } = await response.json();
 
-      // Clear input
+      // Lưu token & user
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // báo cho App cha
+      onLogin(accessToken, user);
+
+      // reset input
       setUsername("");
       setPassword("");
     } catch (error) {

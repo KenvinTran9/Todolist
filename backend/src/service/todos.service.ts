@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { Todo } from '../entity';
 
 @Injectable()
@@ -7,29 +7,32 @@ export class TodosService {
   private idCounter = 1;
 
   findAll(): Todo[] {
-    return this.todos;
+    return this.todos; // trả về tất cả
   }
 
-  create(text: string): Todo {
-    const todo: Todo = {
-      id: this.idCounter++,
-      text,
-      isCompleted: false,
-    };
+  create(text: string, userId: number): Todo {
+    const todo: Todo = { id: this.idCounter++, text, isCompleted: false, createdBy: userId };
     this.todos.push(todo);
     return todo;
   }
 
-  update(id: number): Todo {
-    const todo = this.todos.find(t => t.id === id);
+  update(id: number, userId: number, isCompleted: boolean): Todo {
+    const todo = this.todos.find((t) => t.id === id);
     if (!todo) throw new NotFoundException('Todo not found');
-    todo.isCompleted = !todo.isCompleted;
+    if (todo.createdBy !== userId) throw new ForbiddenException('Not allowed');
+    todo.isCompleted = isCompleted;
     return todo;
   }
 
-  remove(id: number): void {
-    const index = this.todos.findIndex(t => t.id === id);
+  remove(id: number, userId: number): { message: string } {
+    const index = this.todos.findIndex((t) => t.id === id);
     if (index === -1) throw new NotFoundException('Todo not found');
+    if (this.todos[index].createdBy !== userId) throw new ForbiddenException('Not allowed');
     this.todos.splice(index, 1);
+    return { message: 'Deleted successfully' };
+  }
+
+  findOne(id: number): Todo | undefined {
+    return this.todos.find((t) => t.id === id);
   }
 }

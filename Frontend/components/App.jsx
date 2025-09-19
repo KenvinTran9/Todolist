@@ -1,110 +1,73 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../app/AuthProvider";
 
-function App({ token }) {
-  const [input, setInput] = useState("");
+function App() {
+  const { token, user } = useContext(AuthContext);
   const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState("");
 
   useEffect(() => {
+    if (!token) return;
     const fetchTodos = async () => {
       try {
-        const response = await fetch("http://localhost:4000/todos", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const res = await fetch("http://localhost:4000/api/todos", {
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (!response.ok) {
-          console.error("Failed to fetch todos");
-          return;
-        }
-
-        const data = await response.json();
+        if (!res.ok) throw new Error("Fetch todos failed");
+        const data = await res.json();
         setTodos(data);
       } catch (err) {
-        console.error("Error fetching todos:", err);
+        console.error(err);
       }
     };
-
-    if (token) {
-      fetchTodos();
-    }
+    fetchTodos();
   }, [token]);
 
-
   const handleAdd = async () => {
-    if (input.trim() === "") {
-      alert("Please enter something");
-      return;
-    }
-
+    if (!input.trim()) return;
     try {
-      const response = await fetch("http://localhost:4000/todos/create", {
+      const res = await fetch("http://localhost:4000/api/todos/create", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ text: input.trim() }),
       });
-
-      if (!response.ok) {
-        alert("Failed to add todo");
-        return;
-      }
-
-      const newTodo = await response.json();
-      console.log("Added todo:", newTodo);
-      setTodos([...todos, newTodo]);
+      if (!res.ok) return;
+      const newTodo = await res.json();
+      setTodos((prev) => [...prev, newTodo]);
       setInput("");
     } catch (err) {
-      console.error("Error adding todo:", err);
+      console.error(err);
     }
   };
 
   const handleComplete = async (id) => {
+    const todo = todos.find((t) => t.id === id);
+    if (!todo) return;
     try {
-      const todo = todos.find((t) => t.id === id);
-
-      const response = await fetch(`http://localhost:4000/todos/${id}`, {
+      const res = await fetch(`http://localhost:4000/api/todos/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ isCompleted: !todo.isCompleted }),
       });
-
-      if (!response.ok) {
-        console.error("Failed to update todo");
-        return;
-      }
-
-      const updated = await response.json();
-      setTodos(todos.map((t) => (t.id === id ? updated : t)));
+      if (!res.ok) return;
+      const updated = await res.json();
+      setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
     } catch (err) {
-      console.error("Error updating todo:", err);
+      console.error(err);
     }
   };
 
-
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/todos/${id}`, {
+      const res = await fetch(`http://localhost:4000/api/todos/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!response.ok) {
-        console.error("Failed to delete todo");
-        return;
-      }
-
-      setTodos(todos.filter((t) => t.id !== id));
+      if (!res.ok) return;
+      setTodos((prev) => prev.filter((t) => t.id !== id));
     } catch (err) {
-      console.error("Error deleting todo:", err);
+      console.error(err);
     }
   };
 
@@ -132,30 +95,35 @@ function App({ token }) {
         </div>
       ) : (
         <ul className="todolist">
-          {todos.map((todo) => (
-            <li
-              key={todo.id}
-              className={`card flex list-none bg-gray-100 mb-2.5 p-4 rounded-md items-center transition-transform duration-300 ease-in-out border-l-4 border-indigo-500 hover:translate-x-1 shadow-md ${
-                todo.isCompleted ? "line-through text-gray-500" : ""
-              }`}
-            >
-              <span className="flex-1">{todo.text} </span>
-              <div className="action flex gap-4">
-                <button
-                  className="complete-btn bg-green-600 text-white font-bold px-4 py-2 rounded hover:scale-105 hover:bg-green-700"
-                  onClick={() => handleComplete(todo.id)}
-                >
-                  {todo.isCompleted ? "Undo" : "Complete"}
-                </button>
-                <button
-                  className="delete-btn bg-red-600 text-white font-bold px-4 py-2 rounded hover:scale-105 hover:bg-red-700"
-                  onClick={() => handleDelete(todo.id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
+          {todos.map((todo) => {
+            const isOwner = user?.userId === todo.createdBy;
+            return (
+              <li
+                key={todo.id}
+                className={`card flex list-none bg-gray-100 mb-2.5 p-4 rounded-md items-center transition-transform duration-300 ease-in-out border-l-4 border-indigo-500 hover:translate-x-1 shadow-md ${
+                  todo.isCompleted ? "line-through text-gray-500" : ""
+                }`}
+              >
+                <span className="flex-1">{todo.text}</span>
+                {isOwner && (
+                  <div className="action flex gap-4">
+                    <button
+                      className="complete-btn bg-green-600 text-white font-bold px-4 py-2 rounded hover:scale-105 hover:bg-green-700"
+                      onClick={() => handleComplete(todo.id)}
+                    >
+                      {todo.isCompleted ? "Undo" : "Complete"}
+                    </button>
+                    <button
+                      className="delete-btn bg-red-600 text-white font-bold px-4 py-2 rounded hover:scale-105 hover:bg-red-700"
+                      onClick={() => handleDelete(todo.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>
