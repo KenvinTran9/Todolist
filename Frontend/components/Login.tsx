@@ -1,14 +1,18 @@
 "use client";
 import { useState } from "react";
 
-function Login({ onLogin }) {
+interface LoginProps {
+  onLogin: (token: string, user: any) => void;
+}
+
+function Login({ onLogin }: LoginProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
-    if (!username || !password) {
+    if (!username.trim() || !password.trim()) {
       setError("Please enter username & password");
       return;
     }
@@ -37,30 +41,24 @@ function Login({ onLogin }) {
 
       const { accessToken, user } = await response.json();
 
-      if (!accessToken || !user) {
-        setError("Invalid response from server");
-        return;
-      }
-
       localStorage.setItem("token", accessToken);
       localStorage.setItem("user", JSON.stringify(user));
 
       onLogin(accessToken, user);
+
       setUsername("");
       setPassword("");
       setError("");
-    } catch (error) {
-      console.error("Login error:", error);
+    } catch (err) {
+      console.error("Login error:", err);
       setError("Network error, please check your connection and try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleLogin();
-    }
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleLogin();
   };
 
   return (
@@ -76,19 +74,19 @@ function Login({ onLogin }) {
       <input
         type="text"
         placeholder="Username"
-        className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         onKeyPress={handleKeyPress}
+        className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
         disabled={loading}
       />
       <input
         type="password"
         placeholder="Password"
-        className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         onKeyPress={handleKeyPress}
+        className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
         disabled={loading}
       />
       <button

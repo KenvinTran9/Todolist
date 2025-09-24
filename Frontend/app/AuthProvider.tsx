@@ -2,7 +2,11 @@
 
 import { createContext, useState, useEffect, ReactNode } from "react";
 
-type User = { userId: number; username: string; role: string };
+type User = {
+  id: number;
+  username: string;
+  role: string;
+};
 
 type AuthContextType = {
   token: string | null;
@@ -23,11 +27,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
+    const savedToken = localStorage.getItem("token") || null;
     const savedUser = localStorage.getItem("user");
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+    try {
+      if (savedToken && savedUser) {
+        setToken(savedToken);
+        setUser(JSON.parse(savedUser) as User);
+      }
+    } catch {
+      console.warn("Failed to parse user from localStorage");
+      localStorage.removeItem("user");
     }
   }, []);
 

@@ -14,7 +14,7 @@ import {
 import { TodosService } from '../service/todos.service';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 import { TodoOwnerGuard } from '../TodoOwnerGuard';
-import { Todo } from '../entity';
+import { Todo } from '../entity/todo.entity';
 export class CreateTodoDto {
   text: string;
 }
