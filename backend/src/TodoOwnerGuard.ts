@@ -11,12 +11,12 @@ import { TodosService } from './service/todos.service';
 export class TodoOwnerGuard implements CanActivate {
   constructor(private readonly todosService: TodosService) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     const todoId = parseInt(request.params.id, 10);
 
-    const todo = this.todosService.findOne(todoId);
+    const todo = await this.todosService.findOne(todoId);
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }

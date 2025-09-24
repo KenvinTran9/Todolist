@@ -2,9 +2,13 @@ import { Module } from '@nestjs/common';
 import { TodosController } from '../controller/todos.controller';
 import { TodosService } from '../service/todos.service';
 import { TodoOwnerGuard } from '../TodoOwnerGuard';
+import { Todo } from 'src/entity';
+import { TypeOrmModule } from '@nestjs/typeorm'
+;
 @Module({
+  imports: [TypeOrmModule.forFeature([Todo])],
   controllers: [TodosController],
-  providers: [TodosService, TodoOwnerGuard], // 👈 thêm guard vào đây
+  providers: [TodosService, TodoOwnerGuard], 
   exports: [TodosService],
 })
 export class TodosModule {}

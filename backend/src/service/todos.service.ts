@@ -1,66 +1,59 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
-import type { Todo } from '../entity';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Todo } from '../entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TodosService {
-  private todos: Todo[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(Todo)
+    private readonly todoRepository: Repository<Todo>,
+  ) {}
 
-  findAll(): Todo[] {
-    return this.todos;
+  async findAll(): Promise<Todo[]> {
+    return this.todoRepository.find();
   }
 
-  create(text: string, userId: number): Todo {
-    const todo: Todo = {
-      id: this.idCounter++,
+  async create(text: string, userId: number): Promise<Todo> {
+    const todo = this.todoRepository.create({
       text,
       isCompleted: false,
       createdBy: userId,
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
-    this.todos.push(todo);
-    return todo;
+    });
+    return this.todoRepository.save(todo);
   }
 
-  update(id: number, userId: number, isCompleted: boolean): Todo {
-    const todo = this.todos.find((t) => t.id === id);
+
+  async update(id: number, userId: number, isCompleted: boolean): Promise<Todo> {
+    const todo = await this.todoRepository.findOne({ where: { id } });
     if (!todo) throw new NotFoundException('Todo not found');
     if (todo.createdBy !== userId) throw new ForbiddenException('Not allowed');
 
     todo.isCompleted = isCompleted;
     todo.updatedAt = new Date();
-    return todo;
+    return this.todoRepository.save(todo);
   }
 
-  remove(id: number, userId: number): { message: string } {
-    const index = this.todos.findIndex((t) => t.id === id);
-    if (index === -1) throw new NotFoundException('Todo not found');
-    if (this.todos[index].createdBy !== userId)
-      throw new ForbiddenException('Not allowed');
 
-    this.todos.splice(index, 1);
+  async remove(id: number, userId: number): Promise<{ message: string }> {
+    const todo = await this.todoRepository.findOne({ where: { id } });
+    if (!todo) throw new NotFoundException('Todo not found');
+    if (todo.createdBy !== userId) throw new ForbiddenException('Not allowed');
+
+    await this.todoRepository.delete(id);
     return { message: 'Deleted successfully' };
   }
 
-  findOne(id: number): Todo | undefined {
-    return this.todos.find((t) => t.id === id);
+  async findOne(id: number): Promise<Todo> {
+    const todo = await this.todoRepository.findOne({ where: { id } });
+    if (!todo) throw new NotFoundException('Todo not found');
+    return todo;
   }
 
-  isOwner(todoId: number, userId: number): boolean {
-    const todo = this.findOne(todoId);
+  async isOwner(todoId: number, userId: number): Promise<boolean> {
+    const todo = await this.todoRepository.findOne({ where: { id: todoId } });
     return todo ? todo.createdBy === userId : false;
-  }
-
-  getUsernameById(userId: number): string {
-    const userMap = {
-      1: 'admin',
-      2: 'admin1',
-    };
-    return userMap[userId] || `User${userId}`;
   }
 }

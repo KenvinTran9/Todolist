@@ -112,10 +112,6 @@ function App() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this todo?")) {
-      return;
-    }
-
     try {
       setError("");
       const res = await fetch(`http://localhost:4000/api/todos/${id}`, {
