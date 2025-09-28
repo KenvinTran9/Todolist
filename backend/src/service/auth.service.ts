@@ -50,7 +50,7 @@ export class AuthService {
     const payload: JwtPayload = {
       username: user.username,
       sub: user.id,
-      role: user.username === 'admin' ? 'admin' : 'user',
+      role: user.role,
     };
     const accessToken = await this.jwtService.signAsync(payload);
 
@@ -59,7 +59,7 @@ export class AuthService {
       user: {
         id: user.id,
         username: user.username,
-        role: user.username === 'admin' ? 'admin' : 'user',
+        role: user.role,
       },
     };
   }
