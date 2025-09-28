@@ -12,8 +12,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { TodosService } from '../service/todos.service';
-import { JwtAuthGuard } from '../jwt-auth.guard';
-import { TodoOwnerGuard } from '../TodoOwnerGuard';
+import { JwtAuthGuard } from '../security/guard/jwt-auth.guard';
+import { TodoOwnerGuard } from '../security/guard/todo-owner.guard';
 import { Todo } from '../entity/todo.entity';
 export class CreateTodoDto {
   text: string;

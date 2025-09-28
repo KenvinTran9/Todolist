@@ -5,7 +5,7 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
-import { TodosService } from './service/todos.service';
+import { TodosService } from '../../service/todos.service';
 
 @Injectable()
 export class TodoOwnerGuard implements CanActivate {

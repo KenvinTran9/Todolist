@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TodosController } from '../controller/todos.controller';
 import { TodosService } from '../service/todos.service';
-import { TodoOwnerGuard } from '../TodoOwnerGuard';
+import { TodoOwnerGuard } from '../security/guard/todo-owner.guard';
 import { Todo } from 'src/entity/todo.entity';
 import { TypeOrmModule } from '@nestjs/typeorm'
 ;
